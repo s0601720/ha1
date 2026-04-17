@@ -90,5 +90,39 @@ class CalculatorTest {
 
 
     //TODO hier weitere Tests erstellen
+
+    //Hat er uns als Beispiel gezeigt
+    @Test
+    void testIntegerDivision(){
+        Calculator calc = new Calculator();
+
+        calc.pressDigitKey(4);
+        calc.pressDigitKey(0);
+        calc.pressBinaryOperationKey("/");
+        calc.pressDigitKey(5);
+        calc.pressEqualsKey();
+
+        String expected = "8";
+        String actual = calc.readScreen();
+
+        assertEquals(expected, actual);
+    }
+    //Aufgabe 2b -> Test der funktioniert
+    @Test
+    @DisplayName("should display the decimal number correctly")
+    void testDecimalInput(){
+        Calculator calc = new Calculator();
+
+        calc.pressDigitKey(8);
+        calc.pressDotKey();
+        calc.pressDigitKey(3);
+
+        String expected = "8.3";
+        String actual = calc.readScreen();
+
+        assertEquals(expected, actual);
+
+    }
+
 }
 
