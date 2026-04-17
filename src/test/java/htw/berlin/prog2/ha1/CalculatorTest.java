@@ -123,6 +123,42 @@ class CalculatorTest {
         assertEquals(expected, actual);
 
     }
+    //Aufgabe 2b (Fehlerkategorie 1)
+    @Test
+    @DisplayName("should calculate correct with the negative number")
+    void testNegativeSubstraction(){
+        Calculator calc = new Calculator();
+
+        calc.pressNegativeKey();
+        calc.pressDigitKey(3);
+        calc.pressBinaryOperationKey("-");
+        calc.pressDigitKey(2);
+        calc.pressEqualsKey();
+
+        String expected = "-5";
+        String actual = calc.readScreen();
+
+        assertEquals(expected,actual);
+
+    }
+    //Aufgabe 2b (Fehlerkategorie 2)
+    @Test
+    @DisplayName("should add the latest value to the current result")
+    void testMultipleBinary(){
+        Calculator calc = new Calculator();
+
+        calc.pressDigitKey(3);
+        calc.pressBinaryOperationKey("+");
+        calc.pressDigitKey(5);
+        calc.pressEqualsKey();
+        calc.pressEqualsKey();
+
+        String expected = "13";
+        String actual = calc.readScreen();
+
+        assertEquals(expected,actual);
+
+    }
 
 }
 
