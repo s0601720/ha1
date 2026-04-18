@@ -14,6 +14,10 @@ public class Calculator {
 
     private String latestOperation = "";
 
+    private boolean justPressedEquals = false; //überprüft ob man bereits einmal = gedrückt hat
+
+    private double lastInput; //speichert den zweiten Operanden der letzten Operation
+
     /**
      * @return den aktuellen Bildschirminhalt als String
      */
@@ -26,12 +30,20 @@ public class Calculator {
      * drücken kann muss der Wert positiv und einstellig sein und zwischen 0 und 9 liegen.
      * Führt in jedem Fall dazu, dass die gerade gedrückte Ziffer auf dem Bildschirm angezeigt
      * oder rechts an die zuvor gedrückte Ziffer angehängt angezeigt wird.
+     *
+     * Screen zeigt "0" oder "-0" im Startzustand
+     * Bei 0 wird die Null entfernt und die Ziffer gesetzt
+     * Bei -0 bleibt dass Minus und die Null wird ersetzt
      * @param digit Die Ziffer, deren Taste gedrückt wurde
      */
     public void pressDigitKey(int digit) {
         if(digit > 9 || digit < 0) throw new IllegalArgumentException();
 
-        if(screen.equals("0") || latestValue == Double.parseDouble(screen)) screen = "";
+        if (screen.equals("0") || screen.equals("-0")) {
+            screen = screen.startsWith("-") ? "-" : "";
+        } else if (latestValue == Double.parseDouble(screen)) {
+            screen = "";
+        }
 
         screen = screen + digit;
     }
@@ -58,10 +70,13 @@ public class Calculator {
      * Beim zweiten Drücken nach Eingabe einer weiteren Zahl wird direkt des aktuelle Zwischenergebnis
      * auf dem Bildschirm angezeigt. Falls hierbei eine Division durch Null auftritt, wird "Error" angezeigt.
      * @param operation "+" für Addition, "-" für Substraktion, "x" für Multiplikation, "/" für Division
+     *
+     * justPressedEquals setzt es wieder zurück damit die neue Rechnung wieder normal funktioniert
      */
     public void pressBinaryOperationKey(String operation)  {
         latestValue = Double.parseDouble(screen);
         latestOperation = operation;
+        justPressedEquals = false;
     }
 
     /**
@@ -117,16 +132,25 @@ public class Calculator {
      * Wird die Taste weitere Male gedrückt (ohne andere Tasten dazwischen), so wird die letzte
      * Operation (ggf. inklusive letztem Operand) erneut auf den aktuellen Bildschirminhalt angewandt
      * und das Ergebnis direkt angezeigt.
+     *
+     * justPressedEquals guckt ob = bereits gedrückt wurde
+     * Der zweite Operand wird einmal gespeichert und beim wiederholten = einfach wiederverwendet
      */
     public void pressEqualsKey() {
-
+        if (!justPressedEquals){
+            lastInput = Double.parseDouble(screen);
+        }
         var result = switch(latestOperation) {
-            case "+" -> latestValue + Double.parseDouble(screen);
-            case "-" -> latestValue - Double.parseDouble(screen);
-            case "x" -> latestValue * Double.parseDouble(screen);
-            case "/" -> latestValue / Double.parseDouble(screen);
+            case "+" -> latestValue + lastInput;
+            case "-" -> latestValue - lastInput;
+            case "x" -> latestValue * lastInput;
+            case "/" -> latestValue / lastInput;
             default -> throw new IllegalArgumentException();
         };
+
+        latestValue = result;
+        justPressedEquals = true;
+
         screen = Double.toString(result);
         if(screen.equals("Infinity")) screen = "Error";
         if(screen.endsWith(".0")) screen = screen.substring(0,screen.length()-2);
